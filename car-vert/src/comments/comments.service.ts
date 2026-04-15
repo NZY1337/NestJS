@@ -4,22 +4,37 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './comment.entity';
 import { ReportsService } from '../reports/reports.service';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class CommentsService {
     constructor(@InjectRepository(Comment) private commentRepo: Repository<Comment>,
         private reportRepo: ReportsService) { }
 
-    async create(bodyDto: CreateCommentDto, id: string) {
+    async create(bodyDto: CreateCommentDto, id: string, user: User) {
         const report = await this.reportRepo.getReport(id);
         const newComment = this.commentRepo.create(bodyDto);
 
         newComment.report = report;
+        newComment.user = user;
+
         return this.commentRepo.save(newComment);
     }
 
     async getComments(id: string): Promise<Comment[]> {
         const report = await this.reportRepo.getReport(id);
-        return this.commentRepo.find({ where: { report: { id: report.id } }, relations: { report: true } });
+        return this.commentRepo.find({
+            where: {
+                report: {
+                    id: report.id
+                }
+            },
+            relations: {
+                report: {
+                    user: true
+                },
+                user: true
+            }
+        });
     }
 }

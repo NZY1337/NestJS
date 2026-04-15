@@ -1,5 +1,4 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UsersService } from '../users.service';
 
 const getUserSession = async (data: any, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();

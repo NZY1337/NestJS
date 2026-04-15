@@ -3,7 +3,9 @@ import {
     Column,
     PrimaryGeneratedColumn,
     ManyToOne,
-    OneToMany
+    OneToMany,
+    ManyToMany,
+    JoinTable,
 } from "typeorm";
 import { User } from "../users/user.entity";
 import { Comment } from "../comments/comment.entity";
@@ -44,4 +46,8 @@ export class Report {
     // one report can have MANY comments
     @OneToMany(() => Comment, (comment) => comment.report)
     comments: Comment[];
+
+    @ManyToMany(() => User)
+    @JoinTable()
+    likedBy: User[];
 }

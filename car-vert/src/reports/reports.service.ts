@@ -44,4 +44,33 @@ export class ReportsService {
         report.approved = approved;
         return this.repo.save(report);
     }
+
+    async likeReport(id: number, user: User) {
+        const report = await this.repo.findOne({ where: { id }, relations: { likedBy: true } });
+
+        if (!report) {
+            throw new NotFoundException('report not found');
+        }
+
+        const likedByCurrentUser = report.likedBy.map(user => user.id);
+
+        if (likedByCurrentUser.includes(user.id)) {
+            report.likedBy = report.likedBy.filter(u => u.id !== user.id);
+        } else {
+            report.likedBy.push(user);
+        }
+
+        await this.repo.save(report);
+        return report.likedBy.length
+    }
+
+    async getLikes(id: number) {
+        const report = await this.repo.findOne({ where: { id }, relations: { likedBy: true } });
+
+        if (!report) {
+            throw new NotFoundException('report not found');
+        }
+
+        return report.likedBy;
+    }
 }

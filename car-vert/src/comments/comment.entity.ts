@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { Report } from "../reports/report.entity";
+import { User } from "../users/user.entity";
 
 // I want to have coments on a report, so
 // report.comments
@@ -23,5 +24,8 @@ export class Comment {
 
     @ManyToOne(() => Report, (report) => report.comments)
     report: Report;
+
+    @ManyToOne(() => User, (user) => user.comments)
+    user: User;
 }
 

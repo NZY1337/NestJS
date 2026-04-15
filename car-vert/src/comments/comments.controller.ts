@@ -6,6 +6,8 @@ import { AuthGuard } from '../guards/auth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentDto } from './dto/comment.dto';
 import { CommentsService } from './comments.service';
+import { CurrentUser } from '../users/decorators/current-user.decorator';
+import { User } from '../users/user.entity';
 
 @Serialize(CommentDto)
 @UseGuards(AuthGuard)
@@ -14,8 +16,12 @@ export class CommentsController {
     constructor(private commentService: CommentsService) { }
 
     @Post('/:id')
-    createComment(@Body() body: CreateCommentDto, @Param('id') id: string) {
-        return this.commentService.create(body, id);
+    createComment(
+        @Body() body: CreateCommentDto,
+        @Param('id') id: string,
+        @CurrentUser() user: User
+    ) {
+        return this.commentService.create(body, id, user);
     }
 
     @Get('/:id')
