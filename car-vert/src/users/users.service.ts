@@ -25,6 +25,9 @@ export class UsersService {
 
     // run a query to find a user with a given id, and return the first record that matches
     findOne(id: number) {
+        if (!id) {
+            return null;
+        }
         return this.repo.findOneBy({ id });
     }
 

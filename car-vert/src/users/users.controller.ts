@@ -8,23 +8,50 @@ import {
     Query,
     Delete,
     NotFoundException,
+    Session,
+    UseGuards
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
-import { Serialize } from 'interceptors/serialize.interceptors';
+import { AuthService } from './auth.services';
+import { Serialize } from '../interceptors/serialize.interceptors';
 import { UserDto } from './dtos/user.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { User } from './user.entity';
+import { AuthGuard } from '../guards/auth.guard';
 
-// we can also use the Serialize decorator at the controller level, 
-// so that all the routes in this controller will be serialized using the UserDto class  
 @Serialize(UserDto)
 @Controller('auth')
 export class UsersController {
-    constructor(private usersService: UsersService) { }
+    constructor(private usersService: UsersService,
+        private authService: AuthService
+    ) { }
+
+    @UseGuards(AuthGuard)
+    @Get('/whoami')
+    whoAmI(@CurrentUser() user: User) {
+        return user;
+    }
+
+    @Post('/signout')
+    signOut(@Session() session: any) {
+        session.userId = null;
+        throw new NotFoundException('user signed out');
+    }
 
     @Post('/signup')
-    createUser(@Body() body: CreateUserDto) {
-        return this.usersService.create(body.email, body.password);
+    async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signup(body.email, body.password);
+        session.userId = user.id;
+        return user;
+    }
+
+    @Post('/signin')
+    async signIn(@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signin(body.email, body.password);
+        session.userId = user.id;
+        return user;
     }
 
     // request id comes as string always, so we need to parse it to a number
