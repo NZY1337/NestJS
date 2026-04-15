@@ -61,7 +61,7 @@ export class ReportsService {
         }
 
         await this.repo.save(report);
-        return report.likedBy.length
+        return report.likedBy
     }
 
     async getLikes(id: number) {
@@ -71,6 +71,6 @@ export class ReportsService {
             throw new NotFoundException('report not found');
         }
 
-        return report.likedBy;
+        return report.likedBy.length;
     }
 }
