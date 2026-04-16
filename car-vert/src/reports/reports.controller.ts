@@ -34,7 +34,7 @@ export class ReportsController {
     @Get('/:id')
     @Serialize(ReportDto)
     getReport(@Param('id') id: string) {
-        return this.reportService.getReport(id);
+        return this.reportService.getReport(parseInt(id));
     }
 
     @Get()

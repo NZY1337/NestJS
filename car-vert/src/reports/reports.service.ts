@@ -17,7 +17,7 @@ export class ReportsService {
         return this.repo.save(report);
     }
 
-    async getReport(id: string) {
+    async getReport(id: number) {
         const report = await this.repo.findOne({ where: { id: +id }, relations: { user: true } });
 
         if (!report) {
