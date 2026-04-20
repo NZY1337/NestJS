@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, Delete } from '@nestjs/common';
 import { ReportsService } from '../reports/reports.service';
 import { Serialize } from '../interceptors/serialize.interceptors';
 import { UseGuards } from '@nestjs/common';
@@ -21,11 +21,26 @@ export class CommentsController {
         @Param('id') id: string,
         @CurrentUser() user: User
     ) {
-        return this.commentService.create(body, id, user);
+        return this.commentService.create(body, parseInt(id), user);
     }
 
     @Get('/:id')
     getComments(@Param('id') id: string) {
-        return this.commentService.getComments(id);
+        return this.commentService.getComments(parseInt(id));
+    }
+
+    @Get('/:reportId/:commentId')
+    getComment(
+        @Param('reportId') reportId: string,
+        @Param('commentId') commentId: string,
+    ) {
+        return this.commentService.getComment(parseInt(reportId), parseInt(commentId));
+    }
+
+    @Delete('/:reportId/:commentId')
+    deleteComment(@Param('reportId') reportId: string,
+        @Param('commentId') commentId: string,
+        @CurrentUser() user: User) {
+        return this.commentService.deleteComment(parseInt(reportId), parseInt(commentId), user)
     }
 }
